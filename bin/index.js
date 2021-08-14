@@ -1,53 +1,42 @@
 #!/usr/bin/env node
 
-const lib = require("mars-test-lib");
-const argv = require("process").argv;
+const yargs = require("yargs/yargs");
+const { hideBin } = require("yargs/helpers");
+const dedent = require("dedent");
 
-console.log("welcome mars-cli !!!");
+const arg = hideBin(process.argv);
+const cli = yargs(arg);
 
-// 取得第一個參數
-const command = argv[2];
+cli
+  .usage("Usage: mars [command] <options>")
+  // 至少第一個參數要輸入
+  .demandCommand(
+    1,
+    "A command is required. Pass --help to see all available commands and options."
+  )
+  .strict()
+  .alias("h", "help")
+  .alias("v", "version")
+  // 指令每行文字寬度, 使用 terminalWidth 可撐滿
+  .wrap(cli.terminalWidth())
+  // 底部註解文字, 使用 dedent 方法可自動將字串每行頭、尾空格去除, 靠左對齊排列
+  .epilogue(
+    dedent(`
+  When a command fails, all logs are written to lerna-debug.log in the current working directory.
 
-if (!command) {
-  console.log("請輸入指令");
-  return;
-}
-
-if (lib[command]) {
-  lib[command](getOption(argv));
-} else {
-  console.log("無效的指令");
-}
-
-const globalOption = getGlobalOption(argv);
-if (isVersion(globalOption)) {
-  printVersion();
-}
-
-// 取得第一個之後所有參數
-// 輸入 mars init --name mars => 返回 { option: 'name', param: 'mars'}
-function getOption(argv) {
-  const options = argv.slice(3);
-  let [option, param] = options;
-  option = option.replace("--", "");
-
-  return { option, param };
-}
-
-// 取得全局指令判斷
-// 輸入 mars --version、mars -version => version
-function getGlobalOption(argv) {
-  const command = argv[2];
-  if (command.startsWith("--") || command.startsWith("-")) {
-    return command.replace(/--|-/g, "");
-  }
-  return "";
-}
-
-function printVersion() {
-  console.log("1.0.0");
-}
-
-function isVersion(str) {
-  return str === "version" || str === "V";
-}
+  For more information, find our manual at https://github.com/lerna/lerna`)
+  )
+  .options({
+    debug: {
+      type: "boolean",
+      describe: "Bootstrap debug mode",
+      alias: "d"
+    }
+  })
+  .option("registry", {
+    type: "string",
+    describe: "Define global registry",
+    alias: "r"
+  })
+  .group(["debug"], "Dev Options: ")
+  .group(["registry"], "Extra Options: ").argv;
