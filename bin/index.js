@@ -1,20 +1,31 @@
 #!/usr/bin/env node
 
 const yargs = require("yargs/yargs");
-const { hideBin } = require("yargs/helpers");
 const dedent = require("dedent");
+const pkg = require("../package.json");
 
-const arg = hideBin(process.argv);
-const cli = yargs(arg);
+const cli = yargs();
+const argv = process.argv.slice(2);
+
+const context = {
+  marsVersion: pkg.version
+};
 
 cli
-  .usage("Usage: mars [command] <options>")
+  .usage("Usage: $0 [command] <options>")
   // 至少第一個參數要輸入
   .demandCommand(
     1,
     "A command is required. Pass --help to see all available commands and options."
   )
   .strict()
+  // 參數輸入錯誤時, 會自動判斷給予提示
+  // 例如輸入 mars lis, 會提示：您是指 list 嗎？
+  .recommendCommands()
+  // 自訂錯誤顯示文字
+  .fail((err, msg) => {
+    console.log(err);
+  })
   .alias("h", "help")
   .alias("v", "version")
   // 指令每行文字寬度, 使用 terminalWidth 可撐滿
@@ -62,6 +73,7 @@ cli
     describe: "List local packages",
     builder: (yargs) => {},
     handler: (argv) => {
-      console.log("list");
+      console.log("list", argv);
     }
-  }).argv;
+  })
+  .parse(argv, context);
