@@ -39,4 +39,29 @@ cli
     alias: "r"
   })
   .group(["debug"], "Dev Options: ")
-  .group(["registry"], "Extra Options: ").argv;
+  .group(["registry"], "Extra Options: ")
+  // 使用順序參數設定
+  .command(
+    "init [name]",
+    "Do init a project",
+    (yargs) => {
+      yargs.option("name", {
+        type: "string",
+        describe: "Name of a project",
+        alias: "n"
+      });
+    },
+    (argv) => {
+      console.log("argv", argv);
+    }
+  )
+  // 使用 object options 方式
+  .command({
+    command: "list",
+    aliases: ["ls", "la", "ll"],
+    describe: "List local packages",
+    builder: (yargs) => {},
+    handler: (argv) => {
+      console.log("list");
+    }
+  }).argv;
