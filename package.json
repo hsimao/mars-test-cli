@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "commander": "^8.1.0",
     "dedent": "^0.7.0",
     "mars-test-lib": "^1.0.3",
     "yargs": "^17.1.1"
