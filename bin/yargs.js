@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+console.log(ll);
 const yargs = require("yargs/yargs");
 const dedent = require("dedent");
 const pkg = require("../package.json");
